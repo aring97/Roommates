@@ -4,6 +4,7 @@ using System.Text;
 using Microsoft.Data.SqlClient;
 using Roommates.Models;
 
+
 namespace Roommates.Repositories
 {
     class RoommateRepository: BaseRepository
@@ -45,5 +46,35 @@ namespace Roommates.Repositories
                 }
             }
         }
+        public List<Roommate> GetAll()
+        {
+            using (SqlConnection conn = Connection)
+            {
+                conn.Open();
+                using (SqlCommand cmd = conn.CreateCommand())
+                {
+                    cmd.CommandText = "Select * FROM Roommate";
+                    SqlDataReader reader = cmd.ExecuteReader();
+                    List<Roommate> Roommates = new List<Roommate>();
+                    while (reader.Read())
+                    {
+                        RoomRepository roomrepo = new RoomRepository(@"server=localhost\SQLExpress;database=Roommates;integrated security=true");
+                        Roommate roommate = new Roommate
+                        {
+                            Id = reader.GetInt32(reader.GetOrdinal("Id")),
+                            Firstname = reader.GetString(reader.GetOrdinal("FirstName")),
+                            Lastname = reader.GetString(reader.GetOrdinal("LastName")),
+                            RentPortion = reader.GetInt32(reader.GetOrdinal("RentPortion")),
+                            MovedInDate = reader.GetDateTime(reader.GetOrdinal("MoveInDate")),
+                            Room = roomrepo.GetById(reader.GetInt32(reader.GetOrdinal("RoomId")))
+                        };
+                        Roommates.Add(roommate);
+                    }
+                    reader.Close();
+                    return Roommates;
+                }
+            }
+        }
+
     }
 }
