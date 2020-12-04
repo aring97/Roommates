@@ -141,9 +141,10 @@ namespace Roommates.Repositories
                 conn.Open();
                 using (SqlCommand cmd = conn.CreateCommand())
                 {
-                    cmd.CommandText = "DELETE FROM Chore WHERE Id=@id";
-                    cmd.CommandText = "DELETE FROM RoommateChore WHERE ChoreId=@id";
                     cmd.Parameters.AddWithValue("@id", id);
+                    cmd.CommandText = "DELETE FROM Chore WHERE Id=@id";
+                    cmd.ExecuteNonQuery();
+                    cmd.CommandText = "DELETE FROM RoommateChore WHERE ChoreId=@id";
                     cmd.ExecuteNonQuery();
                 }
             }
